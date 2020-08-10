@@ -1,10 +1,12 @@
 import speech_recognition as sr
 import json
+import webbrowser
 
 class Gregg:
 
     def __init__(self):
         self.recognizer = sr.Recognizer()
+
         with open("SECURE/G-API-Creds.json") as file:
             credsDict = json.load(file)
             self.GOOGLE_API_CREDENTIALS = json.dumps(credsDict)
@@ -12,6 +14,7 @@ class Gregg:
 
     def listen(self):
         with sr.Microphone() as source:
+            self.recognizer.adjust_for_ambient_noise(source)
             print("Listening...")
             audio = self.recognizer.listen(source, None, 5)
             print("Finished")
@@ -23,7 +26,18 @@ class Gregg:
         except sr.RequestError as e:
             print("Google Cloud Speech was unreachable: {0}".format(e))
 
-        return speech
+        self.parseForCommand(speech)
+
+    def parseForCommand(self, speech):
+
+        command = speech[:speech.find(" ")]
+
+        if command == "Google":
+            self.google(speech[speech.find(" ") + 1:])
+
+
+    def google(self, query):
+        webbrowser.open_new_tab("https://www.google.com/search?q=" + query)
 
 
 
